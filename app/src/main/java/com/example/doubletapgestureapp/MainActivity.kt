@@ -47,13 +47,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DoubleTapZoomGesture(modifier: Modifier = Modifier) {
-   ImageWithZoom(modifier)
+    ImageWithZoom(modifier)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DoubleTapZoomGesturePreview() {
-        DoubleTapZoomGesture()
+    DoubleTapZoomGesture()
 }
 
 @Composable
@@ -85,27 +85,18 @@ fun ImageWithZoom(modifier: Modifier = Modifier) {
 fun Offset.calculateDoubleTapOffset(newZoom: Float,
                                     previousZoom: Float, size: IntSize, tapOffset: Offset
 ): Offset {
-
-    // 1. Calculate the change in offset due to the zoom.
-    //    - tapOffset / previousZoom: The tap position relative to the content at the previous zoom.
-    //    - tapOffset / newZoom: The tap position relative to the content at the new zoom.
-    //    - The difference between these two is the change in offset needed to keep the tap position
-    //      under the same point in the content.
+    // Tracks tap and zoom offsets relative to the point of each transformation
     val zoomOffsetChange = (tapOffset / previousZoom) - (tapOffset / newZoom)
 
-    // 2. Calculate the new offset by adding the change to the current offset.
-    val newOffset = this  + zoomOffsetChange
+    // Accumulates current offset with change
+    val newOffset = this + zoomOffsetChange
 
-    // 3. Calculate the visible area of the content at the new zoom level.
+    // Calculates maxOffset to keep the transformed image within visible bounds
     val visibleWidth = size.width / newZoom
     val visibleHeight = size.height / newZoom
 
-    // 4. Calculate the maximum allowed offset in each direction.
-    //    - If the visible area is larger than the content, the max offset is 0 (no scrolling needed).
-    //    - Otherwise, it's the difference between the content size and the visible area.
     val maxOffsetX = max(0f, size.width - visibleWidth)
     val maxOffsetY = max(0f, size.height - visibleHeight)
 
-    // 5. Ensure the new offset stays within the allowed bounds.
     return Offset(newOffset.x.coerceIn(0f, maxOffsetX), newOffset.y.coerceIn(0f, maxOffsetY))
 }
